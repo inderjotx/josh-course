@@ -1,6 +1,7 @@
 "use client";
 import { Heart as HeartIcon } from "lucide-react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
+import { Slider } from "@/components/ui/slider";
 
 const RAD_DELTA = 1; // 5 px
 const SIZE_DELTA = 8; // 3 px
@@ -16,6 +17,7 @@ const ANIMATION_CLASS = "animate-particle";
 const POWER_CLASS = "animate-power-p";
 
 export default function Page() {
+  const [chaos, setChaos] = useState([PARTICLES]);
   const createElement = (particleData: {
     x: number;
     y: number;
@@ -70,7 +72,12 @@ export default function Page() {
   };
 
   const getRandomTime = (baseTime: number) => {
-    return (baseTime + TIME_DELTA * Math.random()).toFixed(2);
+    const chaosResponsiveTime = Math.max(
+      baseTime,
+      baseTime * (chaos[0] / PARTICLES)
+    );
+    console.log("chaosResponsiveTime", chaosResponsiveTime);
+    return (chaosResponsiveTime + TIME_DELTA * Math.random()).toFixed(2);
   };
 
   const getRandomPastelColor = () => {
@@ -113,9 +120,9 @@ export default function Page() {
         const { height } = heartContainer.getBoundingClientRect();
         const elements = [];
 
-        for (let i = 0; i < PARTICLES; i++) {
+        for (let i = 0; i < chaos[0]; i++) {
           // slighly smaller than height is better
-          const { x, y } = getRandomTranslate(height * 0.8);
+          const { x, y } = getRandomTranslate(height * 0.7);
           const randomSize = getRandomSize(SIZE_BASE);
           const randomTime = getRandomTime(TIME_BASE);
           const randomColor = getRandomPastelColor();
@@ -140,10 +147,10 @@ export default function Page() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex flex-col justify-center items-center h-screen gap-20">
       <label
         id={`${PARENT_ID}`}
-        className="cursor-pointer relative rounded-full hover:bg-gray-800 p-8 transition-colors group  flex items-center justify-center"
+        className="cursor-pointer relative rounded-full hover:bg-muted p-8 transition-colors group  flex items-center justify-center"
       >
         <input
           type="checkbox"
@@ -153,6 +160,17 @@ export default function Page() {
         <HeartIcon className="size-20 group-hover:text-red-500 transition-colors peer-checked:text-red-500 peer-checked:fill-red-500 peer-checked:animate-select-heart " />
         {/* <div className="absolute bg-purple-400 inset-0 rounded-full"></div> */}
       </label>
+      <div className="flex flex-col items-center gap-4">
+        <label className="text-sm font-medium">Chaos: {chaos[0]}</label>
+        <Slider
+          value={chaos}
+          onValueChange={setChaos}
+          min={20}
+          max={50}
+          step={1}
+          className="w-64"
+        />
+      </div>
     </div>
   );
 }
