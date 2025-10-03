@@ -3,18 +3,30 @@ import { Heart as HeartIcon } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import { Slider } from "@/components/ui/slider";
 
-const RAD_DELTA = 1; // 5 px
-const SIZE_DELTA = 8; // 3 px
+const SIZE_DELTA = 10; // 10 px
 const TIME_DELTA = 1; // 1 sec
-const PARTICLES = 30;
+const PARTICLES = 30; // 30 particles
 
 const SIZE_BASE = 20; // 8 px
 const TIME_BASE = 0.5; // 1 s
+
+const ANGLE_DELTA = 10; // 10 degrees
 
 // parent class of heart
 const PARENT_ID = "heart-container";
 const ANIMATION_CLASS = "animate-particle";
 const POWER_CLASS = "animate-power-p";
+
+const random = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+const toPolarCoordinates = (angle: number, distance: number) => {
+  const angleRad = (angle * Math.PI) / 180;
+  const x = distance * Math.cos(angleRad);
+  const y = distance * Math.sin(angleRad);
+  return { x, y };
+};
 
 export default function Page() {
   const [chaos, setChaos] = useState([PARTICLES]);
@@ -32,6 +44,8 @@ export default function Page() {
     newDiv.style.height = `${particleData.size}px`;
     newDiv.style.backgroundColor = particleData.color;
     newDiv.style.position = "absolute";
+    newDiv.style.pointerEvents = "none";
+    newDiv.style.userSelect = "none";
     newDiv.style.borderRadius = "50%";
 
     newDiv.style.setProperty("--particle-duration", particleData.duration);
@@ -53,19 +67,6 @@ export default function Page() {
       parentDiv.append(...elements);
     }
   };
-
-  function getRandomTranslate(radius: number) {
-    const randomRadius = radius + RAD_DELTA * Math.random();
-
-    function randomPointOnCircle(cx: number, cy: number, r: number) {
-      const angle = Math.random() * 2 * Math.PI;
-      const x = cx + r * Math.cos(angle);
-      const y = cy + r * Math.sin(angle);
-      return { x, y };
-    }
-
-    return randomPointOnCircle(0, 0, randomRadius);
-  }
 
   const getRandomSize = (baseSize: number) => {
     return Math.ceil(baseSize + SIZE_DELTA * Math.random());
@@ -121,8 +122,12 @@ export default function Page() {
         const elements = [];
 
         for (let i = 0; i < chaos[0]; i++) {
-          // slighly smaller than height is better
-          const { x, y } = getRandomTranslate(height * 0.7);
+          const randomAngle =
+            (360 / chaos[0]) * i + random(-ANGLE_DELTA, ANGLE_DELTA);
+
+          const randomDistance = random(height * 0.7, height * 0.8);
+          const { x, y } = toPolarCoordinates(randomAngle, randomDistance);
+
           const randomSize = getRandomSize(SIZE_BASE);
           const randomTime = getRandomTime(TIME_BASE);
           const randomColor = getRandomPastelColor();
@@ -165,7 +170,7 @@ export default function Page() {
         <Slider
           value={chaos}
           onValueChange={setChaos}
-          min={20}
+          min={10}
           max={50}
           step={1}
           className="w-64"
