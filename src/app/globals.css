@@ -59,7 +59,7 @@
 
   --animate-select-heart : select-heart 0.4s var(--power-p-duration) linear;
   --animate-particle : particle-animation var(--particle-duration) var(--power-p-duration) ease-out forwards;
-  --animate-power-p : power-particle var(--power-p-duration) ease-out forwards;
+  --animate-power-p : power-particle var(--power-p-duration) ease-out forwards , fadeOut 200ms var(--power-p-duration) ease-out forwards;
 
   --color-sidebar-ring : var(--sidebar-ring);
   --color-sidebar-border : var(--sidebar-border);
@@ -151,6 +151,13 @@
     to {
       height : var(--power-p-height);
       width : var(--power-p-width);
+    }
+  }
+
+
+  @keyframes fadeOut {
+    to {
+      opacity: 0;
     }
   }
 
